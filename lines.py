@@ -20,7 +20,7 @@ class Line:
 		self.seed = seed
 		self.condition = condition
 		self.im = image
-
+		print self.im.pixels[self.seed]
 		translations = [
 			lambda seed: seed + self.im.width,
 			lambda seed: seed + 1,
