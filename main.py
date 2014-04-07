@@ -18,7 +18,7 @@ pxArray = numpy.asarray(im)
 #pxArray = numpy.array(im.getdata()).reshape(im.size[0], im.size[1], 4)
 
 
-imgIsWhite = colours.testIsWhiteNP(pxArray)
+imgIsWhite = colours.cleanNoiseNP(colours.testIsWhiteNP(pxArray))
 
 BaWmask = numpy.where(imgIsWhite,255,0).astype(numpy.uint8)
 
@@ -27,7 +27,7 @@ print BaWmask.dtype
 print numpy.count_nonzero(imgIsWhite)
 resultImage = Image.fromarray(BaWmask)
 
-resultImage.save('/Users/planetlabs/Desktop/BaW.tif')
+resultImage.save('/Users/planetlabs/Desktop/BaWCLEAN.tif')
 
 # main looooooop
 """

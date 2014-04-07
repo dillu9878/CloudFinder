@@ -39,8 +39,27 @@ def testSurroundsAreWhite(img, seed):
 	surrounds[2] = img[seed[0]-1,seed[1]]
 	surrounds[3] = img[seed[0],seed[1]-1]
 
-	testIsWhiteNP(surrounds)
+	return testIsWhiteNP(surrounds)
 
+def cleanNoiseNP(img):
+	leftSide = img[1:-1,0:-2]
+	topSide = img[0:-2,1:-1]
+	rightSide = img[1:-1,2:]
+	bottomSide = img[2:,1:-1]
+	print rightSide.shape
+	thisPx = img[1:-1,1:-1]
+	print thisPx.shape
+	result = numpy.logical_and(
+		numpy.logical_and(
+			numpy.where(leftSide,thisPx,False),
+			numpy.where(rightSide, thisPx, False)
+		),
+		numpy.logical_and(
+			numpy.where(topSide, thisPx, False),
+			numpy.where(bottomSide, thisPx, False)
+		)
+	)
+	return result
 
 def testIsWhiteNP(img):
 	imgMin = numpy.minimum (
@@ -59,9 +78,6 @@ def testIsWhiteNP(img):
 	imgMean = imgSum/3
 
 	rangeOK = numpy.less(imgRange,10)
-
-	print(imgMean[1300:1310,2000:2010])
-	print(imgSum[1300:1310,2000:2010])
 
 	meanOK = numpy.greater(imgMean, 145)
 	print numpy.count_nonzero(meanOK)
