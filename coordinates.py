@@ -13,7 +13,8 @@ class Coords:
 	def __str__(self):
 		return '('+self.x+','+self.y+')'
 
-	def getCoords
+	def getCoords:
+		return coordTup
 
 def indexToCoords(index, width,returnType='obj'):
 	y = index / width
