@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+"""colours.py: the testers file"""
+__author__ = 'Max Penrose'
 def testIsWhite(RGBA):
 	pxIsWhite = True
 	RGB = RGBA[:3]

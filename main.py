@@ -1,7 +1,7 @@
 from PIL import Image
 import sys
 import time
-import lines, colours
+import lines, colours, coordinates
 
 startTime = time.time()
 
