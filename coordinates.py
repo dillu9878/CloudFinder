@@ -1,27 +1,32 @@
 class Coords:
-	def __init__(self, inputType='index', data, width=None):
+	def __init__(self, data, width=None, inputType='index'):
 		if(inputType == 'tuple'):
 			self.coordTup = data
-
-		elif (inputType == 'index'):
+		elif(inputType == 'index'):
 			self.index = data
 			self.coordTup = indexToCoords(self.index, width, 'tuple')
-
-		self.x = data[0]
-		self.y = data[1]
+		else:
+			print 'Well, something seems to be quite wrong with your inputType argument...'
+		
+		self.x = self.coordTup[0]
+		self.y = self.coordTup[1]
 
 	def __str__(self):
 		return '('+self.x+','+self.y+')'
 
-	def getCoords:
-		return coordTup
+	def getCoords(self):
+		return self.coordTup
 
 def indexToCoords(index, width,returnType='obj'):
 	y = index / width
-	x = (index - 1) % width
+	x = (index-1) % width
+
+	coordTup = (x,y)
 
 	if(returnType == 'obj'):
-		return Coords(inputType='tuple', data=(x,y))
+		return Coords(coordTup, inputType='tuple')
 	else:
-		return (x,y)
+		return coordTup
 
+if(__name__ == '__main__'):
+	print Coords(6,3).getCoords()
