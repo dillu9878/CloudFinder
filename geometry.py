@@ -2,6 +2,8 @@
 """coordinates.py: a way of interfacing between coordinates and a pixel index and a width"""
 __author__ = 'Max Penrose'
 
+
+from numpy import *
 import coordinates
 
 class rect:
@@ -18,5 +20,4 @@ class rect:
 		self.height = self.corners[0].y - self.corners[1].y
 		self.area = self.width * self.height
 
-	def getPointsInside():
-		
+	#def getPointsInside():

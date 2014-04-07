@@ -1,4 +1,5 @@
 from PIL import Image
+import numpy
 import sys
 import time
 import lines, colours, coordinates
@@ -6,18 +7,34 @@ import lines, colours, coordinates
 startTime = time.time()
 
 imPath = sys.argv[1]
-
-im = Image.open(imPath).convert('RGBA')
+print 'about to open'
+im = Image.open(imPath)
 #im.show()
+print 'opened'
+#pixel = list(im.getdata())
 
-pixel = list(im.getdata())
+pxArray = numpy.asarray(im)
+
+#pxArray = numpy.array(im.getdata()).reshape(im.size[0], im.size[1], 4)
+
+
+imgIsWhite = colours.testIsWhiteNP(pxArray)
+
+BaWmask = numpy.where(imgIsWhite,255,0).astype(numpy.uint8)
+
+print BaWmask.shape
+print BaWmask.dtype
+print numpy.count_nonzero(imgIsWhite)
+resultImage = Image.fromarray(BaWmask)
+
+resultImage.save('/Users/planetlabs/Desktop/BaW.tif')
 
 # main looooooop
-
+"""
 for pxref, px in enumerate(im.getdata()):
 	if(colours.testIsWhite(px)): 
 		lines.LineSpaceFinder(pxref, colours.testIsWhite, im).perform()
-
+"""
 
 
 '''

@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 """colours.py: the testers file"""
 __author__ = 'Max Penrose'
+
+import numpy
+
 def testIsWhite(RGBA):
 	pxIsWhite = True
 	RGB = RGBA[:3]
@@ -26,3 +29,42 @@ def testIsWhite(RGBA):
 		pxIsWhite = False
 
 	return pxIsWhite
+
+def testSurroundsAreWhite(img, seed):
+
+	# surrounds format: numpy.array([top,right,bottom,left])
+	surrounds = numpy.zeros((1, 4))
+	surrounds[0] = img[seed[0]+1,seed[1]]
+	surrounds[1] = img[seed[0],seed[1]+1]
+	surrounds[2] = img[seed[0]-1,seed[1]]
+	surrounds[3] = img[seed[0],seed[1]-1]
+
+	testIsWhiteNP(surrounds)
+
+
+def testIsWhiteNP(img):
+	imgMin = numpy.minimum (
+		numpy.minimum(img[:,:,0],img[:,:,1]),
+		img[:,:,2]
+	)
+
+	imgMax = numpy.maximum (
+		numpy.maximum(img[:,:,0],img[:,:,1]),
+		img[:,:,2]
+	)
+
+	imgRange = imgMax - imgMin
+
+	imgSum = img[:,:,0].astype(numpy.int16) + img[:,:,1] + img[:,:,2]
+	imgMean = imgSum/3
+
+	rangeOK = numpy.less(imgRange,10)
+
+	print(imgMean[1300:1310,2000:2010])
+	print(imgSum[1300:1310,2000:2010])
+
+	meanOK = numpy.greater(imgMean, 145)
+	print numpy.count_nonzero(meanOK)
+	isWhite = numpy.logical_and(rangeOK, meanOK)
+
+	return isWhite
