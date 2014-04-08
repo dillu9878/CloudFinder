@@ -4,6 +4,7 @@ __author__ = 'Max Penrose'
 
 
 import numpy
+import sets
 import coordinates
 
 class otherrect:
@@ -23,11 +24,12 @@ class otherrect:
 	#def getPointsInside():
 
 class rect:
-	def __init__(self, img, startcorner):
+	def __init__(self, img, startcorner, checkedpxs):
 		self.imgShape = img.shape
 		self.TDimg = img
 		self.img = img.reshape(img.size)
 		self.start = startcorner
+		self.checkedpxs = checkedpxs
 
 		self.imgHeight = self.imgShape[0]
 		self.imgWidth = self.imgShape[1]
@@ -61,7 +63,9 @@ class rect:
 		newSeed = seed
 		while pxIsWhite:
 			newSeed = translation(seed)
-			if(self.img[seed]):
+			if(int(seed) in self.checkedpxs):
+				pxIsWhite = False
+			elif(self.img[seed]):
 				seed = newSeed
 			else:
 				pxIsWhite = False

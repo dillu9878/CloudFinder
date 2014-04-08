@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy
+import sets
 import sys
 import time
 import lines, colours, coordinates, geometry
@@ -33,17 +34,20 @@ indexesOfNegatives.shape = (indexesOfNegatives.size)
 
 cleanIndexArray = numpy.delete(fullIndexArray, indexesOfNegatives)
 
-usedPixels = []
+usedPixels = sets.Set()
 cloudCover = 0
 
 print cleanIndexArray.shape
 
 for index in numpy.nditer(cleanIndexArray):
-	if(index not in usedPixels):
-		print usedPixels, '/', cleanIndexArray.size
-		currentRect = geometry.rect(darknessArray, index)
-		usedPixels = usedPixels + currentRect.getPxInside().tolist()[0]
+	if(int(index) not in usedPixels):
+		print len(usedPixels), '/', cleanIndexArray.size
+		currentRect = geometry.rect(darknessArray, index, usedPixels)
+		print currentRect.getPxInside().tolist()[0]
+		usedPixels = usedPixels.union(sets.Set(currentRect.getPxInside().tolist()[0]))
 		cloudCover += currentRect.getArea()
+	else:
+		print 'skipping...'
 
 cloudCoverPercent = (cloudCover / darknessArray.size) * 1000
 
