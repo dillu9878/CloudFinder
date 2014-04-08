@@ -24,4 +24,56 @@ class otherrect:
 
 class rect:
 	def __init__(self, img, startcorner):
+		self.imgShape = img.shape
+		self.TDimg = img
+		self.img = img.reshape(img.size)
+		self.start = startcorner
+
+		self.imgHeight = self.imgShape[0]
+		self.imgWidth = self.imgShape[1]
+
+		self.translations = [
+			lambda seed: seed + self.imgShape[1],
+			lambda seed: seed + 1,
+			lambda seed: seed - self.imgShape[1],
+			lambda seed: seed - 1
+		]
+		up = 0
+		right = 1
+		down = 2
+		left = 3
+
+		self.bottomLeft = self.go(down)
+		self.topRight = self.go(right)
 		
+		self.width = self.topRight - self.start
+		self.height = (self.bottomLeft - self.start) // self.imgWidth
+
+		self.topGap = self.topRight // self.imgWidth
+		self.leftGap = self.topRight % self.imgWidth
+		self.rightGap = self.leftGap + self.width
+		self.bottomGap = self.topGap + self.height
+	def go(self, direction):
+		translation = self.translations[direction]
+		pxIsWhite = True
+		seed = self.start
+		newSeed = seed
+		while pxIsWhite:
+			newSeed = translation(seed)
+			if(self.img[seed]):
+				seed = newSeed
+			else:
+				pxIsWhite = False
+
+		return seed
+
+	def getArea(self):
+		return self.width * self.height
+
+	def getPxInside(self):
+		newIndexMap = numpy.arange(self.img.size).resize(self.imgHeight, self.imgWidth)
+		cropped = newIndexMap[self.topGap:self.bottomGap, self.leftGap:self.rightGap]
+
+		return pxInside
+
+

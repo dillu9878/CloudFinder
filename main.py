@@ -2,7 +2,7 @@ from PIL import Image
 import numpy
 import sys
 import time
-import lines, colours, coordinates
+import lines, colours, coordinates, geometry
 
 startTime = time.time()
 
@@ -19,16 +19,7 @@ pxArray = numpy.asarray(im)
 
 
 darknessArray = colours.cleanNoiseNP(colours.testIsWhiteNP(pxArray))
-'''
-BaWmask = numpy.where(imgIsWhite,255,0).astype(numpy.uint8)
 
-print BaWmask.shape
-print BaWmask.dtype
-print numpy.count_nonzero(imgIsWhite)
-resultImage = Image.fromarray(BaWmask)
-
-resultImage.save('/Users/planetlabs/Desktop/BaWCLEAN.tif')
-'''
 fullIndexArray = numpy.where(darknessArray.reshape((darknessArray.size)), 
 	numpy.arange(darknessArray.size), 
 	numpy.ones(darknessArray.size, dtype=numpy.int64)*-1
@@ -42,23 +33,21 @@ indexesOfNegatives.shape = (indexesOfNegatives.size)
 
 cleanIndexArray = numpy.delete(fullIndexArray, indexesOfNegatives)
 
+usedPixels = []
+cloudCover = 0
 
-for index in numpy.nditer(cleanIndexArray, flags=['external_loop']):
-	 print index
+print cleanIndexArray.shape
 
-# main looooooop
-"""
-for pxref, px in enumerate(im.getdata()):
-	if(colours.testIsWhite(px)): 
-		lines.LineSpaceFinder(pxref, colours.testIsWhite, im).perform()
-"""
+for index in numpy.nditer(cleanIndexArray):
+	if(index not in usedPixels):
+		currentRect = geometry.rect(darknessArray, index)
+		usedPixels = usedPixels + currentRect.getPxInside()
+		print currentRect.getPxInside()
+		cloudCover += currentRect.getArea()
 
+cloudCoverPercent = (cloudCover / darknessArray.size) * 1000
 
-'''
-matrix = ( r / 255.0, 0.0, 0.0, 0.0, 0.0, g / 255.0, 0.0, 0.0, 0.0, 0.0, b / 255.0, 0.0 )
-im.convert('RGBA', matrix).show()
-'''
-# Image.eval(im, lambda px: 0 if px < 150 else px).show()
+print 'the cloud cover is at ' + str(cloudCoverPercent) + '%'
 
 finTime = time.time()
 runTime = finTime - startTime
