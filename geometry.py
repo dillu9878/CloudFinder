@@ -33,9 +33,9 @@ class rect:
 		self.imgWidth = self.imgShape[1]
 
 		self.translations = [
-			lambda seed: seed + self.imgShape[1],
+			lambda seed: seed - self.imgWidth,
 			lambda seed: seed + 1,
-			lambda seed: seed - self.imgShape[1],
+			lambda seed: seed + self.imgWidth,
 			lambda seed: seed - 1
 		]
 		up = 0
@@ -48,7 +48,6 @@ class rect:
 		
 		self.width = self.topRight - self.start
 		self.height = (self.bottomLeft - self.start) // self.imgWidth
-
 		# !!!! Something is wrong in this section
 		self.topGap = self.topRight // self.imgWidth
 		self.leftGap = self.topRight % self.imgWidth
@@ -66,11 +65,14 @@ class rect:
 				seed = newSeed
 			else:
 				pxIsWhite = False
-
 		return seed
 
 	def getArea(self):
-		return self.width * self.height
+		area = self.width * self.height
+		if(area < 30):
+			return 0
+		else:
+			return area
 
 	def getPxInside(self):
 		newIndexMap = numpy.arange(self.img.size)

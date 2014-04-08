@@ -40,9 +40,9 @@ print cleanIndexArray.shape
 
 for index in numpy.nditer(cleanIndexArray):
 	if(index not in usedPixels):
+		print usedPixels, '/', cleanIndexArray.size
 		currentRect = geometry.rect(darknessArray, index)
-		usedPixels = usedPixels + list(currentRect.getPxInside())
-		#print usedPixels
+		usedPixels = usedPixels + currentRect.getPxInside().tolist()[0]
 		cloudCover += currentRect.getArea()
 
 cloudCoverPercent = (cloudCover / darknessArray.size) * 1000
