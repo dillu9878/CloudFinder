@@ -1,12 +1,12 @@
 #!/usr/bin/env python
-"""coordinates.py: a way of interfacing between coordinates and a pixel index and a width"""
+"""geometry.py: defines the shapes that can represent the area of clouds"""
 __author__ = 'Max Penrose'
 
 
-from numpy import *
+import numpy
 import coordinates
 
-class rect:
+class otherrect:
 	def __init__(self, constructPoints):
 		self.constructPoints = constructPoints
 		self.corners = []
@@ -21,3 +21,7 @@ class rect:
 		self.area = self.width * self.height
 
 	#def getPointsInside():
+
+class rect:
+	def __init__(self, img, startcorner):
+		

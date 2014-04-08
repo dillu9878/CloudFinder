@@ -46,9 +46,9 @@ def cleanNoiseNP(img):
 	topSide = img[0:-2,1:-1]
 	rightSide = img[1:-1,2:]
 	bottomSide = img[2:,1:-1]
-	print rightSide.shape
+
 	thisPx = img[1:-1,1:-1]
-	print thisPx.shape
+	
 	result = numpy.logical_and(
 		numpy.logical_and(
 			numpy.where(leftSide,thisPx,False),

@@ -18,8 +18,8 @@ pxArray = numpy.asarray(im)
 #pxArray = numpy.array(im.getdata()).reshape(im.size[0], im.size[1], 4)
 
 
-imgIsWhite = colours.cleanNoiseNP(colours.testIsWhiteNP(pxArray))
-
+darknessArray = colours.cleanNoiseNP(colours.testIsWhiteNP(pxArray))
+'''
 BaWmask = numpy.where(imgIsWhite,255,0).astype(numpy.uint8)
 
 print BaWmask.shape
@@ -28,6 +28,23 @@ print numpy.count_nonzero(imgIsWhite)
 resultImage = Image.fromarray(BaWmask)
 
 resultImage.save('/Users/planetlabs/Desktop/BaWCLEAN.tif')
+'''
+fullIndexArray = numpy.where(darknessArray.reshape((darknessArray.size)), 
+	numpy.arange(darknessArray.size), 
+	numpy.ones(darknessArray.size, dtype=numpy.int64)*-1
+)
+
+indexesOfNegatives = numpy.argwhere(
+	fullIndexArray<0
+)
+
+indexesOfNegatives.shape = (indexesOfNegatives.size)
+
+cleanIndexArray = numpy.delete(fullIndexArray, indexesOfNegatives)
+
+
+for index in numpy.nditer(cleanIndexArray, flags=['external_loop']):
+	 print index
 
 # main looooooop
 """
