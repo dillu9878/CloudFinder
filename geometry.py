@@ -49,10 +49,12 @@ class rect:
 		self.width = self.topRight - self.start
 		self.height = (self.bottomLeft - self.start) // self.imgWidth
 
+		# !!!! Something is wrong in this section
 		self.topGap = self.topRight // self.imgWidth
 		self.leftGap = self.topRight % self.imgWidth
 		self.rightGap = self.leftGap + self.width
 		self.bottomGap = self.topGap + self.height
+
 	def go(self, direction):
 		translation = self.translations[direction]
 		pxIsWhite = True
@@ -71,9 +73,9 @@ class rect:
 		return self.width * self.height
 
 	def getPxInside(self):
-		newIndexMap = numpy.arange(self.img.size).resize(self.imgHeight, self.imgWidth)
+		newIndexMap = numpy.arange(self.img.size)
+
+		newIndexMap.shape = (self.imgHeight, self.imgWidth)
 		cropped = newIndexMap[self.topGap:self.bottomGap, self.leftGap:self.rightGap]
 
-		return pxInside
-
-
+		return cropped
