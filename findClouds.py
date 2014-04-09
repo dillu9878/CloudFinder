@@ -174,7 +174,7 @@ for index in numpy.nditer(cleanIndexArray):
 		cloudCover += currentRect.getArea()
 
 
-cloudCoverPercent = (float(cloudCover) / float(darknessArray.size)) * 100
+cloudCoverPercent = (float(cloudCover) / float(darknessArray.size)) * 1000
 
 print 'the cloud cover is at ' + str(cloudCoverPercent) + '%'
 
