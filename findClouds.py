@@ -144,6 +144,9 @@ def main(args):
 
 	pxArray = gdal_array.LoadFile(imFilePath)
 
+	pxArray = numpy.swapaxes(pxArray, 0,1)
+	pxArray = numpy.swapaxes(pxArray, 1,2)
+
 	#pxArray = numpy.array(im.getdata()).reshape(im.size[0], im.size[1], 4)
 
 
