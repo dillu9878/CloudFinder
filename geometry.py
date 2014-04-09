@@ -5,7 +5,6 @@ __author__ = 'Max Penrose'
 
 import numpy
 import sets
-import coordinates
 
 class otherrect:
 	def __init__(self, constructPoints):
@@ -47,9 +46,9 @@ class rect:
 
 		self.bottomLeft = self.go(down)
 		self.topRight = self.go(right)
-		
 		self.width = self.topRight - self.start
 		self.height = (self.bottomLeft - self.start) // self.imgWidth
+		# !!!! Something is wrong in this comment
 		# !!!! Something is wrong in this section
 		self.topGap = self.topRight // self.imgWidth
 		self.leftGap = self.topRight % self.imgWidth
@@ -77,11 +76,18 @@ class rect:
 			return 0
 		else:
 			return area
-
 	def getPxInside(self):
-		newIndexMap = numpy.arange(self.img.size)
+		cropped = []
 
-		newIndexMap.shape = (self.imgHeight, self.imgWidth)
-		cropped = newIndexMap[self.topGap:self.bottomGap, self.leftGap:self.rightGap]
+		for sub_start in range(self.start, self.bottomLeft, self.imgWidth):
+
+			cropped += range(sub_start, sub_start+self.width)
 
 		return cropped
+	# def getPxInside(self):
+	# 	newIndexMap = numpy.arange(self.img.size)
+
+	# 	newIndexMap.shape = (self.imgHeight, self.imgWidth)
+	# 	cropped = newIndexMap[self.topGap:self.bottomGap, self.leftGap:self.rightGap]
+
+	# 	return cropped

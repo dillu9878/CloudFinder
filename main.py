@@ -3,7 +3,7 @@ import numpy
 import sets
 import sys
 import time
-import lines, colours, coordinates, geometry
+import colours, geometry
 
 startTime = time.time()
 
@@ -37,17 +37,12 @@ cleanIndexArray = numpy.delete(fullIndexArray, indexesOfNegatives)
 usedPixels = sets.Set()
 cloudCover = 0
 
-print cleanIndexArray.shape
-
 for index in numpy.nditer(cleanIndexArray):
 	if(int(index) not in usedPixels):
-		print len(usedPixels), '/', cleanIndexArray.size
 		currentRect = geometry.rect(darknessArray, index, usedPixels)
-		print currentRect.getPxInside().tolist()[0]
-		usedPixels = usedPixels.union(sets.Set(currentRect.getPxInside().tolist()[0]))
+		usedPixels = usedPixels.union(sets.Set(currentRect.getPxInside()))
 		cloudCover += currentRect.getArea()
 	else:
-		print 'skipping...'
 
 cloudCoverPercent = (cloudCover / darknessArray.size) * 1000
 
