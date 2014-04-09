@@ -164,7 +164,7 @@ def main(args):
 
 	usedPixels = sets.Set()
 	cloudCover = 0
-
+	print cleanIndexArray.size
 	for index in numpy.nditer(cleanIndexArray):
 		if(int(index) not in usedPixels):
 			currentRect = rect(darknessArray, index, usedPixels)
