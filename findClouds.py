@@ -1,8 +1,16 @@
-from PIL import Image
+#!/usr/bin/env python
+
+#from PIL import Image
 import numpy
 import sets
 import sys
+import os
 import cStringIO
+import argparse
+
+from osgeo import gdal, gdal_array
+
+from planet_common.client import urls, storage
 
 class rect:
 	def __init__(self, img, startcorner, checkedpxs):
@@ -30,12 +38,6 @@ class rect:
 		self.topRight = self.go(right)
 		self.width = self.topRight - self.start
 		self.height = (self.bottomLeft - self.start) // self.imgWidth
-		# !!!! Something is wrong in this comment
-		# !!!! Something is wrong in this section
-		self.topGap = self.topRight // self.imgWidth
-		self.leftGap = self.topRight % self.imgWidth
-		self.rightGap = self.leftGap + self.width
-		self.bottomGap = self.topGap + self.height
 
 	def go(self, direction):
 		translation = self.translations[direction]
@@ -131,50 +133,86 @@ def authFetch(url):
     rv = urllib2.urlopen(url)
     return rv
 
+def main(args):
+	print 'main'
+	imPath = args.input_file
+
+	imFilePath = storage.get_scene_file(None, 'flock1_pretty', imPath)
+
+	#im = Image.open(imFilePath)
+	#pxArray = numpy.asarray(im)
+
+	pxArray = gdal_array.LoadFile(imFilePath)
+
+	#pxArray = numpy.array(im.getdata()).reshape(im.size[0], im.size[1], 4)
 
 
-imPath = sys.argv[1]
-im = Image.open(imPath)
+	darknessArray = cleanNoiseNP(testIsWhiteNP(pxArray))
 
-url = 'https://storage.planet-labs.com/v0/scenes/flock1_rectified/20140219_220641_073c_r.tif/raw'
+	fullIndexArray = numpy.where(darknessArray.reshape((darknessArray.size)), 
+		numpy.arange(darknessArray.size), 
+		numpy.ones(darknessArray.size, dtype=numpy.int64)*-1
+	)
 
-#print authFetch(url).read()
-#imfile = cStringIO.StringIO(authFetch(url).read())
+	indexesOfNegatives = numpy.argwhere(
+		fullIndexArray<0
+	)
+	
+	indexesOfNegatives.shape = (indexesOfNegatives.size)
 
-#im = Image.open(imfile)
+	cleanIndexArray = numpy.delete(fullIndexArray, indexesOfNegatives)
 
+	usedPixels = sets.Set()
+	cloudCover = 0
 
-pxArray = numpy.asarray(im)
-
-#pxArray = numpy.array(im.getdata()).reshape(im.size[0], im.size[1], 4)
-
-
-darknessArray = cleanNoiseNP(testIsWhiteNP(pxArray))
-
-fullIndexArray = numpy.where(darknessArray.reshape((darknessArray.size)), 
-	numpy.arange(darknessArray.size), 
-	numpy.ones(darknessArray.size, dtype=numpy.int64)*-1
-)
-
-indexesOfNegatives = numpy.argwhere(
-	fullIndexArray<0
-)
-
-indexesOfNegatives.shape = (indexesOfNegatives.size)
-
-cleanIndexArray = numpy.delete(fullIndexArray, indexesOfNegatives)
-
-usedPixels = sets.Set()
-cloudCover = 0
-
-for index in numpy.nditer(cleanIndexArray):
-	if(int(index) not in usedPixels):
-		currentRect = rect(darknessArray, index, usedPixels)
-		usedPixels = usedPixels.union(sets.Set(currentRect.getPxInside()))
-		cloudCover += currentRect.getArea()
+	for index in numpy.nditer(cleanIndexArray):
+		if(int(index) not in usedPixels):
+			currentRect = rect(darknessArray, index, usedPixels)
+			usedPixels = usedPixels.union(sets.Set(currentRect.getPxInside()))
+			cloudCover += currentRect.getArea()
 
 
-cloudCoverPercent = (float(cloudCover) / float(darknessArray.size)) * 1000
+	cloudCoverPercent = (float(cloudCover) / float(darknessArray.size)) * 1000
 
-print 'the cloud cover is at ' + str(cloudCoverPercent) + '%'
+	print 'the cloud cover is at ' + str(cloudCoverPercent) + '%'
 
+
+def RunFromArgs(rawargs):
+    aparser = argparse.ArgumentParser(
+        description='Search for and find the area of the image obscured by cloud')
+
+    aparser.add_argument('-c', '--cloud',
+                         help='services domain, ie athq.pl or raxpl.us')
+    aparser.add_argument('--info', action='store_true',
+                         help='Turn on INFO level logging.')
+    aparser.add_argument('--debug', action='store_true',
+                         help='Turn on DEBUG level logging.')
+    aparser.add_argument('input_file')
+
+    args = aparser.parse_args(rawargs[1:])
+
+    if args.cloud:
+        urls.set_urls(args.cloud)
+
+    main(args)
+
+def RunFromEnv():
+    args = [sys.argv[0]]
+
+    if 'INPUT_FILE' in os.environ:
+        args += os.environ['INPUT_FILE']
+
+    if 'CMD_OPTS' in os.environ:
+        args += os.environ['CMD_OPTS'].split()
+
+    logging.info('Invoking with arguments:\n  %s' % ' '.join(args))
+    RunFromArgs(args)
+
+
+if __name__ == '__main__':
+    if len(sys.argv) == 1 and 'PL_JOB_ID' in os.environ:
+        status = RunFromEnv()
+    else:
+        status = RunFromArgs(sys.argv)
+
+    sys.exit(status)
