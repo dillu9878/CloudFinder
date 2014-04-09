@@ -3,6 +3,7 @@ import numpy
 import sets
 import sys
 import time
+import cStringIO
 import colours, geometry
 
 startTime = time.time()
@@ -13,6 +14,35 @@ im = Image.open(imPath)
 #im.show()
 print 'opened'
 #pixel = list(im.getdata())
+
+url = 'https://storage.planet-labs.com/v0/scenes/flock1_rectified/20140219_220641_073c_r.tif/raw'
+
+def authFetch(url):
+    """
+    Some versions of the requests library have trouble following a redirect
+    from an url with userid/password without passing it on the redirect too.
+    This function helps us work around that using urllib2.  A proper fix
+    is already upstream in requests, and has made it into our 12.04 repos.
+    """
+
+    
+
+    import urllib2
+    passman =  urllib2.HTTPPasswordMgrWithDefaultRealm()
+    passman.add_password(None, 'https://storage.planet-labs.com',
+                     'cosmogia', 'pieppiep')
+    urllib2.install_opener(
+        urllib2.build_opener(urllib2.HTTPBasicAuthHandler(passman)))
+
+    rv = urllib2.urlopen(url)
+    return rv
+
+
+#print authFetch(url).read()
+#imfile = cStringIO.StringIO(authFetch(url).read())
+
+#im = Image.open(imfile)
+
 
 pxArray = numpy.asarray(im)
 
@@ -42,9 +72,9 @@ for index in numpy.nditer(cleanIndexArray):
 		currentRect = geometry.rect(darknessArray, index, usedPixels)
 		usedPixels = usedPixels.union(sets.Set(currentRect.getPxInside()))
 		cloudCover += currentRect.getArea()
-	else:
 
-cloudCoverPercent = (cloudCover / darknessArray.size) * 1000
+
+cloudCoverPercent = (float(cloudCover) / float(darknessArray.size)) * 100
 
 print 'the cloud cover is at ' + str(cloudCoverPercent) + '%'
 
